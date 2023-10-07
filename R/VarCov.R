@@ -62,7 +62,9 @@ getVarCov.lme <-
                 sds <- rep(1, ni)
             sds <- obj$sigma * sds
             cond.var <- t(V * sds) * sds
-            dimnames(cond.var)  <-  list(1:nrow(cond.var),1:ncol(cond.var))
+            if (!is.null(V)) {
+                dimnames(cond.var)  <-  list(1:nrow(cond.var),1:ncol(cond.var))
+            }
             if (type=="conditional")
                 result[[as.character(individ)]] <- cond.var
             else
@@ -86,7 +88,8 @@ getVarCov.gls <-
         stop("not implemented for uncorrelated errors")
     if (is.null(grp <- getGroups(csT)))
         stop("not implemented for correlation structures without a grouping factor")
-    S <- corMatrix(csT)[[individual]]
+    S <- corMatrix(csT)[[as.character(individual)]]
+
     if (!is.null( obj$modelStruct$varStruct))
     {
         ind <- if (is.numeric(individual)) {
@@ -94,8 +97,10 @@ getVarCov.gls <-
                } else         grp  == individual
         vw  <-  1/varWeights(obj$modelStruct$varStruct)[ind]
     }
-    else vw  <-  rep(1,nrow(S))
-    vars  <-  (obj$sigma * vw)^2
+    else if (!is.null(S)) {
+        vw  <-  rep(1,nrow(S))
+        vars  <-  (obj$sigma * vw)^2
+    } else vars  <-  (obj$sigma)^2
     result  <-  t(S * sqrt(vars))*sqrt(vars)
     class(result)  <-  c("marginal","VarCov")
     attr(result,"group.levels")  <-  names(obj$groups)

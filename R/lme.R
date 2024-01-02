@@ -284,7 +284,7 @@ lme.formula <-
   ncols <- c(ncols, dim(X)[2L], 1)
   Q <- ncol(grps)
   ## creating the condensed linear model
-  dims <- MEdims(grps, ncols)
+  dims <- nlme:::MEdims(grps, ncols)
   attr(lmeSt, "conLin") <-
     list(Xy = array(c(Z, X, y), c(N, sum(ncols)),
                     list(row.names(dataMix), c(colnames(Z), colnames(X),
@@ -301,7 +301,7 @@ lme.formula <-
       warning(msg, domain = NA)
   }
   ## degrees of freedom for testing fixed effects
-  fixDF <- getFixDF(X, grps, dims$ngrps, terms = Terms)
+  fixDF <- nlme:::getFixDF(X, grps, dims$ngrps, terms = Terms)
   ## initialization
   lmeSt <- Initialize(lmeSt, dataMix, grps, control = controlvals)
   parMap <- attr(lmeSt, "pmap")
@@ -310,7 +310,7 @@ lme.formula <-
     ## need to save conLin for calculating fitted values and residuals
     oldConLin <- attr(lmeSt, "conLin")
     decomp <- TRUE
-    attr(lmeSt, "conLin") <- MEdecomp(attr(lmeSt, "conLin"))
+    attr(lmeSt, "conLin") <- nlme:::MEdecomp(attr(lmeSt, "conLin"))
   } else decomp <- FALSE
   ## Setup for optimization iterations
   if(controlvals$opt == "nlminb") {
@@ -335,9 +335,10 @@ lme.formula <-
   numIter <- 0L
   repeat {
     oldPars <- coef(lmeSt)
+    print(class(lmeSt))
     optRes <-
       if (controlvals$opt == "nlminb") {
-        nlminb(c(oldPars), function(lmePars) -logLik(lmeSt, lmePars),
+        nlminb(c(oldPars), function(lmePars) -nlme:::logLik.lmeStruct(lmeSt, lmePars),
                control = control)
       } else { ## "optim"
         if(numIter == 1L) { # (yes, strange, but back-compatible ..) :
@@ -345,11 +346,11 @@ lme.formula <-
           if(is.null(reltol)) reltol <- 100*.Machine$double.eps
           control$reltol <- reltol
         }
-        optim(c(oldPars), function(lmePars) -logLik(lmeSt, lmePars),
+        optim(c(oldPars), function(lmePars) -nlme:::logLik.lmeStruct(lmeSt, lmePars),
               control = control, method = controlvals$optimMethod)
       }
     coef(lmeSt) <- optRes$par
-    attr(lmeSt, "lmeFit") <- MEestimate(lmeSt, grps)
+    attr(lmeSt, "lmeFit") <- nlme:::MEestimate(lmeSt, grps)
     ## checking if any updating is needed
     if (!needUpdate(lmeSt)) {
       if (optRes$convergence) {
@@ -646,7 +647,7 @@ MEdecomp <-
     ## no point in doing the decomposition
     return(conLin)
   }
-  dc <- array(.C(mixed_decomp,
+  dc <- array(.C(nlme:::mixed_decomp,
                  as.double(conLin$Xy),
                  as.integer(unlist(dims)))[[1L]],
               c(dims$StrRows, dims$ZXcols))
@@ -1941,7 +1942,7 @@ predict.lme <-
   attr(lmeSt, "conLin") <-
     list(Xy = array(c(Z, X, double(N)), c(N, sum(ncols)),
                     list(row.names(dataMix), c(colnames(Z), colnames(X), "resp"))),
-         dims = MEdims(grps, ncols))
+         dims = nlme:::MEdims(grps, ncols))
   ## Getting the appropriate BLUPs of the random effects
   re <- object$coefficients$random[1:maxQ]
   for(i in names(re)) {
@@ -2806,7 +2807,7 @@ Initialize.lmeStruct <-
     class(object) <- c("lmeStructInt", class(object))
   }
   if (needUpdate(object)) {
-    attr(object, "lmeFit") <- MEestimate(object, groups)
+    attr(object, "lmeFit") <- nlme:::MEestimate(object, groups)
     update(object, data)
   } else {
     object
@@ -2896,7 +2897,7 @@ chkRank.drop.cols <- function(X,
   ## Test and match arguments:
   stopifnot(is.matrix(X))
   action <- match.arg(action)
- 
+
   if (action == "skip") return(X)
 
   p <- ncol(X)

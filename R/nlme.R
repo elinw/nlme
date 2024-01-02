@@ -796,7 +796,7 @@ nlme.formula <-
       nlmeSt <- update(nlmeSt, dataMixShrunk)
     }
     if (decomp) {
-      attr(nlmeSt, "conLin") <- MEdecomp(oldConLin)
+      attr(nlmeSt, "conLin") <- nlme:::MEdecomp(oldConLin)
     }
     oldPars <- coef(nlmeSt)
     if (controlvals$opt == "nlminb") {
@@ -832,7 +832,7 @@ nlme.formula <-
           numIter, aNlm$code),
           if(aNlm$code == 4) "Do increase 'msMaxIter'!"))
     }
-    nlmeFit <- attr(nlmeSt, "lmeFit") <- MEestimate(nlmeSt, grpShrunk)
+    nlmeFit <- attr(nlmeSt, "lmeFit") <- nlme:::MEestimate(nlmeSt, grpShrunk)
     if (verbose) {
       cat("\n**Iteration", numIter)
       cat(sprintf("\nLME step: Loglik: %s, %s iterations: %d\n",
@@ -953,11 +953,11 @@ nlme.formula <-
   ## wrapping up
   nlmeFit <-
     if (decomp)
-      MEestimate(nlmeSt, grpShrunk, oldConLin)
+      nlme:::MEestimate(nlmeSt, grpShrunk, oldConLin)
     else
-      MEestimate(nlmeSt, grpShrunk)
+      nlme:::MEestimate(nlmeSt, grpShrunk)
   ## degrees of freedom for fixed effects tests
-  fixDF <- getFixDF(ZX[, rLen + (1:fLen), drop = FALSE],
+  fixDF <- nlme:::getFixDF(ZX[, rLen + (1:fLen), drop = FALSE],
                     grpShrunk, attr(nlmeSt, "conLin")$dims$ngrps, fixAssign)
 
   ## 17-11-2015; Fixed sigma patch; SH Heisterkamp; Quantitative Solutions

@@ -102,7 +102,7 @@ createConLin <-
     list(Xy = array(c(Z, X, y), c(N, sum(ncols)),
                     list(row.names(dataMix),
                          c(colnames(Z), colnames(X), deparse(fixed[[2]])))),
-         dims = MEdims(grps, ncols), logLik = 0,
+         dims = nlme:::MEdims(grps, ncols), logLik = 0,
          sigma = 0) # <- no "fixed Sigma" yet
 }
 
@@ -137,7 +137,7 @@ simulate.lme <-
 	    lmeSt <- lmeStruct(reStruct = reStruct(reSt, REML = REML))
 	    attr(lmeSt, "conLin") <- conLin
 	    lmeSt <- Initialize(lmeSt, data = NULL, groups = NULL, control = control)
-	    attr(lmeSt, "conLin") <- MEdecomp(attr(lmeSt, "conLin"))
+	    attr(lmeSt, "conLin") <- nlme:::MEdecomp(attr(lmeSt, "conLin"))
 	    aMs <- nlminb(c(coef(lmeSt)),
 			  function(lmePars) -logLik(lmeSt, lmePars),
 			  control = list(iter.max = control$msMaxIter,

@@ -837,9 +837,7 @@ nlme.formula <-
       cat("\n**Iteration", numIter)
       cat(sprintf("\nLME step: Loglik: %s, %s iterations: %d\n",
                   format(nlmeFit$logLik), controlvals$opt, convIter))
-      print(nlmeSt)
     }
-
     ## PNLS step
     if (is.null(correlation)) {
       cF <- 1.0

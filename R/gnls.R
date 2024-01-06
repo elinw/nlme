@@ -223,7 +223,7 @@ gnls <- function(model,
       model.matrix(form1s, .X)
     }
   }
-  
+
   ##
   ## Params effects names
   ##
@@ -388,7 +388,7 @@ gnls <- function(model,
     } else {
       vW <- varWeights(gnlsSt$varStruct)
     }
-    work <- .C(fit_gnls,
+    work <- .C(nlme:::fit_gnls,
 	       thetaNLS = as.double(spar),
 	       as.integer(unlist(Dims)),
 	       as.double(cF),

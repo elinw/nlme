@@ -536,7 +536,7 @@ nlme.formula <-
   rLen <- sum(rlength)                  # total number of random effects
   pLen <- rLen + fLen                   # total number of parameters
   ncols <- c(rlength, fLen, 1)
-  Dims <- MEdims(grpShrunk, ncols)
+  Dims <- nlme:::MEdims(grpShrunk, ncols)
   if (max(Dims$ZXlen[[1]]) < Dims$qvec[1]) {
     warning(gettextf("fewer observations than random effects in all level %s groups",
                      Q), domain = NA)

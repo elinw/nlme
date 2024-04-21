@@ -335,7 +335,6 @@ lme.formula <-
   numIter <- 0L
   repeat {
     oldPars <- coef(lmeSt)
-    print(class(lmeSt))
     optRes <-
       if (controlvals$opt == "nlminb") {
         nlminb(c(oldPars), function(lmePars) -nlme:::logLik.lmeStruct(lmeSt, lmePars),
